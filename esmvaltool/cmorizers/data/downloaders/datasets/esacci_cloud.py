@@ -131,10 +131,8 @@ def download_dataset(config, dataset, dataset_info, start_date, end_date,
             logger.info("Downloading monthly data (L3C) for sat = %s", sat)
             if sat != '':
                 folder_l3c = base_path_l3c + sat + f'{year}/'
-                print(wget_options)
                 wget_options_new = wget_options.copy()
                 wget_options_new.append(f'--accept={date}*.nc')
-                print(wget_options_new)
                 logger.info("Download folder for monthly data (L3C): %s",
                             folder_l3c)
                 try:
