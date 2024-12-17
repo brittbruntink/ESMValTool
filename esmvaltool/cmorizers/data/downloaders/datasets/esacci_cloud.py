@@ -29,9 +29,9 @@ def download_dataset(config, dataset, dataset_info, start_date, end_date,
         Overwrite already downloaded files
     """
     if start_date is None:
-        start_date = datetime(2000, 1, 1)
+        start_date = datetime(2003, 1, 1)
     if end_date is None:
-        end_date = datetime(2000, 2, 1)
+        end_date = datetime(2003, 12, 31)
     loop_date = start_date
 
     downloader = WGetDownloader(
@@ -47,28 +47,14 @@ def download_dataset(config, dataset, dataset_info, start_date, end_date,
     base_path_l3c = ('https://public.satproj.klima.dwd.de/data/ESA_Cloud_CCI/'
                      'CLD_PRODUCTS/v3.0/L3C/')
 
-    # File patterns for daily (L3U) and monthly (L3C) data
-    files_l3u = [
-        "*-ESACCI-L3U_CLOUD-CLD_MASKTYPE-AVHRR_*-fv3.0.nc",
-        "*-ESACCI-L3U_CLOUD-CLD_PRODUCTS-AVHRR_*-fv3.0.nc"
-    ]
-    files_l3c = ["*-ESACCI-L3C_CLOUD-CLD_PRODUCTS-AVHRR_*-fv3.0.nc"]
-
     wget_options = [
         '-r',
-        '-nH',  # Disable the creation of directory structure
-        '-e',
-        'robots=off',  # Ignore robots.txt
-        '--cut-dirs=9',
+        '-e robots=off',  # Ignore robots.txt
         '--no-parent',  # Don't ascend to the parent directory
         '--reject="index.html"',  # Reject any HTML files
-        #'--accept=*.nc'  # Accept only .nc files
     ]
 
-    #end_year = end_date.year
-    #loop_year = start_date.year
     while loop_date <= end_date:
-    #while loop_year <= end_year:
         year = loop_date.year
         month = loop_date.month
         date = f'{year}{month:02}'
@@ -113,21 +99,6 @@ def download_dataset(config, dataset, dataset_info, start_date, end_date,
             logger.error("Data for this date %s is not available",
                          date)
 
-        print(sat_am)
-        print(sat_pm)
-        ## Download daily data from L3U
-        #for sat in (sat_am, sat_pm):
-        #    logger.info("Downloading daily data (L3U) for sat = %s", sat)
-        #    if sat != '':
-        #        folder_l3u = base_path_l3u + sat + f'{year}/{month:02}'
-        #        logger.info("Download folder for daily data (L3U): %s",
-        #                    folder_l3u)
-        #        try:
-        #            downloader.download_file(folder_l3u, wget_options)
-        #        except Exception as e:
-        #            logger.error("Failed to download daily data from %s: %s",
-        #                         folder_l3u, str(e))
-
         # Download monthly data from L3C
         for sat in (sat_am, sat_pm):
             if sat != '':
@@ -148,7 +119,7 @@ def download_dataset(config, dataset, dataset_info, start_date, end_date,
                 logger.info("Downloading daily data (L3U) for sat = %s", sat)
                 folder_l3u = base_path_l3u + sat + f'{year}/{month:02}'
                 wget_options_l3u = wget_options.copy()
-                wget_options_l3u.append('--accept={date}*CLD_MASKTYPE*.nc,{date}*CLD_PRODUCTS*.nc')
+                wget_options_l3u.append(f'--accept={date}*CLD_MASKTYPE*.nc,{date}*CLD_PRODUCTS*.nc')
                 logger.info("Download folder for daily data (L3U): %s",
                             folder_l3u)
                 try:
